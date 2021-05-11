@@ -8,11 +8,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        child: Center(
-          child: Text('ini Home Screen'),
-        ),
+    return Container(
+      child: Center(
+        child: Text('ini Home Screen'),
       ),
     );
   }

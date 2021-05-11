@@ -1,0 +1,1 @@
+enum TextFocus { focus, unFocus }
