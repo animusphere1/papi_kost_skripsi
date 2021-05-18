@@ -1,6 +1,7 @@
+import 'dart:io';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:papikost/ui/constant/constant.dart';
 import 'package:papikost/ui/enum/enum.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -23,6 +24,9 @@ class HomeBody extends StatefulWidget {
 }
 
 class _HomeBodyState extends State<HomeBody> {
+  File? file;
+
+  //attribute
   TextStyle textStyleStatusTrue = TextStyle(
     fontWeight: FontWeight.w700,
     fontSize: 15,
@@ -40,22 +44,17 @@ class _HomeBodyState extends State<HomeBody> {
     'Sign Up',
   ];
 
-  bool? statusNew = false;
+  bool? statusNew = true;
 
   String? name;
+
+  PageController _controller = PageController(initialPage: 0);
+
+  //function
 
   @override
   initState() {
     super.initState();
-    checkAuth();
-  }
-
-  checkAuth() {
-    if (!statusNew!) {
-      setState(() {
-        name = 'Doni';
-      });
-    }
   }
 
   @override
@@ -67,10 +66,14 @@ class _HomeBodyState extends State<HomeBody> {
         children: [
           _appBar(),
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.2,
+            height: deviceHeight(context) * 0.1,
           ),
           statusNew! ? _textWelcomeNew() : _textWelcomeRememberMe(),
           statusNew! ? _textSecondRowNew() : _textSecondRowRememberMe(),
+          SizedBox(
+            height: 20,
+          ),
+          Expanded(child: pageBuilder()),
         ],
       ),
     );
@@ -81,7 +84,13 @@ class _HomeBodyState extends State<HomeBody> {
       child: Row(
         children: [
           Expanded(flex: 1, child: _tabBar()),
-          Icon(Icons.ac_unit),
+          Container(
+            height: 15,
+            width: 10,
+            decoration: BoxDecoration(
+              color: statusBarColor,
+            ),
+          ),
         ],
       ),
     );
@@ -110,11 +119,7 @@ class _HomeBodyState extends State<HomeBody> {
     Size? textSize,
   }) {
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          index = i!;
-        });
-      },
+      onTap: () {},
       child: Container(
         margin: EdgeInsets.only(right: 10),
         child: Column(
@@ -176,7 +181,7 @@ class _HomeBodyState extends State<HomeBody> {
           TextSpan(text: 'Hello,'),
           WidgetSpan(
             child: SizedBox(
-              width: 5,
+              width: 10,
             ),
           ),
           TextSpan(
@@ -191,7 +196,7 @@ class _HomeBodyState extends State<HomeBody> {
     return RichText(
       text: TextSpan(
         style: TextStyle(
-          fontSize: 25.0,
+          fontSize: 20.0,
           color: Colors.black,
         ),
         children: [
@@ -213,7 +218,7 @@ class _HomeBodyState extends State<HomeBody> {
     return RichText(
       text: TextSpan(
         style: TextStyle(
-          fontSize: 14.0,
+          fontSize: 20.0,
           color: Colors.black,
         ),
         children: [
@@ -230,13 +235,6 @@ class _HomeBodyState extends State<HomeBody> {
     );
   }
 
-  Widget _textField(TextFocus textFocus, BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.1,
-      color: Colors.yellow,
-    );
-  }
-
   Size _textSize(String text, TextStyle style) {
     TextPainter textPainter = TextPainter(
         text: TextSpan(text: text, style: style),
@@ -244,5 +242,85 @@ class _HomeBodyState extends State<HomeBody> {
         textDirection: TextDirection.ltr)
       ..layout(minWidth: 0, maxWidth: double.infinity);
     return textPainter.size;
+  }
+
+  Widget _pageView(String page) {
+    switch (page) {
+      case 'Login':
+        return Container(
+          child: Column(
+            children: [
+              SizedBox(height: deviceWidth(context) * 0.1),
+              _textField(
+                  context: context,
+                  hintText: 'Email',
+                  textFocus: TextFocus.focus),
+              SizedBox(height: 20),
+              _textField(
+                  context: context,
+                  hintText: 'Password',
+                  textFocus: TextFocus.unFocus),
+              file != null ? Expanded(child: Image.file(file!)) : SizedBox(),
+            ],
+          ),
+        );
+      case 'SignUp':
+        return Container(
+          child: Column(
+            children: [
+              // _textField(TextFocus.focus, context, 'Email'),
+              // _textField(TextFocus.unFocus, context, 'Password'),
+              // file != null ? Expanded(child: Image.file(file!)) : SizedBox(),
+            ],
+          ),
+        );
+    }
+
+    return Container();
+  }
+
+  Widget pageBuilder() {
+    return PageView.builder(
+      physics: BouncingScrollPhysics(),
+      controller: _controller,
+      onPageChanged: (i) {
+        index = i;
+        setState(() {});
+      },
+      itemCount: listPage.length,
+      itemBuilder: (context, i) {
+        return _pageView(listPage[i]);
+      },
+    );
+  }
+
+  //textField widget
+  dynamic focusScope(BuildContext context, TextFocus focus) {
+    switch (focus) {
+      case TextFocus.focus:
+        return FocusScope.of(context).nextFocus();
+      case TextFocus.unFocus:
+        return FocusScope.of(context).unfocus();
+      default:
+    }
+  }
+
+  Widget _textField(
+      {TextFocus textFocus = TextFocus.focus,
+      BuildContext? context,
+      String? hintText}) {
+    return Container(
+      height: deviceHeight(context!) * 0.1,
+      child: TextField(
+        onEditingComplete: () => focusScope(context, textFocus),
+        decoration: InputDecoration(
+          hintStyle: TextStyle(
+            color: Colors.grey,
+          ),
+          hintText: hintText,
+          hintMaxLines: 8,
+        ),
+      ),
+    );
   }
 }
