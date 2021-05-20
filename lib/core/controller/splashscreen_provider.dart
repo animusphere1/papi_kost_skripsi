@@ -3,6 +3,7 @@ import 'package:papikost/ui/router/router_generator.dart';
 
 class SplashScreenProvider extends ChangeNotifier {
   bool? _statusLogin = false;
+
   bool? get statusLogin => _statusLogin;
 
   checkAuth(BuildContext context) async {

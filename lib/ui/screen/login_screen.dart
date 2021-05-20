@@ -1,8 +1,9 @@
-import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:papikost/ui/constant/constant.dart';
 import 'package:papikost/ui/enum/enum.dart';
+import 'package:papikost/ui/utils/validator.dart';
+import 'package:supercharged/supercharged.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -13,6 +14,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: HomeBody(),
     );
   }
@@ -23,10 +25,9 @@ class HomeBody extends StatefulWidget {
   _HomeBodyState createState() => _HomeBodyState();
 }
 
-class _HomeBodyState extends State<HomeBody> {
-  File? file;
+class _HomeBodyState extends State<HomeBody> with Validator {
+  //property
 
-  //attribute
   TextStyle textStyleStatusTrue = TextStyle(
     fontWeight: FontWeight.w700,
     fontSize: 15,
@@ -48,6 +49,8 @@ class _HomeBodyState extends State<HomeBody> {
 
   String? name;
 
+  String? pageActive;
+
   PageController _controller = PageController(initialPage: 0);
 
   //function
@@ -55,12 +58,13 @@ class _HomeBodyState extends State<HomeBody> {
   @override
   initState() {
     super.initState();
+    pageActive = tabBarTextList[0];
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -68,19 +72,19 @@ class _HomeBodyState extends State<HomeBody> {
           SizedBox(
             height: deviceHeight(context) * 0.1,
           ),
-          statusNew! ? _textWelcomeNew() : _textWelcomeRememberMe(),
-          statusNew! ? _textSecondRowNew() : _textSecondRowRememberMe(),
-          SizedBox(
-            height: 20,
-          ),
-          Expanded(child: pageBuilder()),
+          pageActive == "Login" ? _textLogin() : _textSignUp(),
+          Expanded(flex: 2, child: _pageBuilder()),
+          bottomAppBar(),
         ],
       ),
     );
   }
 
+  //appbar
   Widget _appBar() {
     return Container(
+      // height: deviceHeight(context) * 0.2,
+      margin: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
       child: Row(
         children: [
           Expanded(flex: 1, child: _tabBar()),
@@ -100,12 +104,12 @@ class _HomeBodyState extends State<HomeBody> {
     return Container(
       child: Row(
         children: [
-          for (var i = 0; i < tabBarTextList.length; i++)
+          for (var i = 0; i < listPage.length; i++)
             _tabBarText(
               status: index == i,
-              text: tabBarTextList[i],
+              text: listPage[i],
               i: i,
-              textSize: _textSize(tabBarTextList[i], textStyleStatusTrue),
+              textSize: _textSize(listPage[i], textStyleStatusTrue),
             ),
         ],
       ),
@@ -119,7 +123,11 @@ class _HomeBodyState extends State<HomeBody> {
     Size? textSize,
   }) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () async {
+        pageActive = tabBarTextList[i!];
+        setState(() {});
+        _controller.jumpToPage(i);
+      },
       child: Container(
         margin: EdgeInsets.only(right: 10),
         child: Column(
@@ -147,6 +155,20 @@ class _HomeBodyState extends State<HomeBody> {
                 : SizedBox()
           ],
         ),
+      ),
+    );
+  }
+
+  //title Login
+  Widget _textLogin() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          statusNew! ? _textWelcomeNew() : _textWelcomeRememberMe(),
+          statusNew! ? _textSecondRowNew() : _textSecondRowRememberMe(),
+        ],
       ),
     );
   }
@@ -235,6 +257,21 @@ class _HomeBodyState extends State<HomeBody> {
     );
   }
 
+  //title sign up
+  Widget _textSignUp() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          statusNew! ? _textWelcomeNew() : _textWelcomeRememberMe(),
+          statusNew! ? _textSecondRowNew() : _textSecondRowRememberMe(),
+        ],
+      ),
+    );
+  }
+
+  //property title
   Size _textSize(String text, TextStyle style) {
     TextPainter textPainter = TextPainter(
         text: TextSpan(text: text, style: style),
@@ -244,33 +281,58 @@ class _HomeBodyState extends State<HomeBody> {
     return textPainter.size;
   }
 
+  //pageview textfield login and signup
   Widget _pageView(String page) {
     switch (page) {
       case 'Login':
         return Container(
+          margin: EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             children: [
-              SizedBox(height: deviceWidth(context) * 0.1),
+              SizedBox(
+                height: 20,
+              ),
               _textField(
                   context: context,
                   hintText: 'Email',
                   textFocus: TextFocus.focus),
-              SizedBox(height: 20),
               _textField(
                   context: context,
                   hintText: 'Password',
                   textFocus: TextFocus.unFocus),
-              file != null ? Expanded(child: Image.file(file!)) : SizedBox(),
             ],
           ),
         );
       case 'SignUp':
         return Container(
+          margin: EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             children: [
-              // _textField(TextFocus.focus, context, 'Email'),
-              // _textField(TextFocus.unFocus, context, 'Password'),
-              // file != null ? Expanded(child: Image.file(file!)) : SizedBox(),
+              SizedBox(
+                height: 20,
+              ),
+              _textField(
+                context: context,
+                hintText: 'Fullname',
+                textFocus: TextFocus.focus,
+              ),
+              _textField(
+                context: context,
+                hintText: 'Phone Number',
+                textFocus: TextFocus.focus,
+                textInputType: TextInputType.phone,
+                textType: TextType.phoneNumber,
+              ),
+              _textField(
+                context: context,
+                hintText: 'Email Address',
+                textFocus: TextFocus.focus,
+              ),
+              _textField(
+                context: context,
+                hintText: 'Password',
+                textFocus: TextFocus.unFocus,
+              ),
             ],
           ),
         );
@@ -279,18 +341,23 @@ class _HomeBodyState extends State<HomeBody> {
     return Container();
   }
 
-  Widget pageBuilder() {
-    return PageView.builder(
-      physics: BouncingScrollPhysics(),
-      controller: _controller,
-      onPageChanged: (i) {
-        index = i;
-        setState(() {});
-      },
-      itemCount: listPage.length,
-      itemBuilder: (context, i) {
-        return _pageView(listPage[i]);
-      },
+  Widget _pageBuilder() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 10),
+      child: PageView.builder(
+        physics: BouncingScrollPhysics(),
+        controller: _controller,
+        onPageChanged: (i) {
+          index = i;
+          pageActive = listPage[i];
+
+          setState(() {});
+        },
+        itemCount: listPage.length,
+        itemBuilder: (context, i) {
+          return _pageView(listPage[i]);
+        },
+      ),
     );
   }
 
@@ -305,21 +372,46 @@ class _HomeBodyState extends State<HomeBody> {
     }
   }
 
+  //textfield widget
   Widget _textField(
       {TextFocus textFocus = TextFocus.focus,
       BuildContext? context,
-      String? hintText}) {
+      String? hintText,
+      TextInputType textInputType = TextInputType.text,
+      TextType textType = TextType.text}) {
     return Container(
       height: deviceHeight(context!) * 0.1,
-      child: TextField(
-        onEditingComplete: () => focusScope(context, textFocus),
-        decoration: InputDecoration(
-          hintStyle: TextStyle(
-            color: Colors.grey,
-          ),
-          hintText: hintText,
-          hintMaxLines: 8,
+      margin: EdgeInsets.symmetric(vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.black12.withOpacity(0.05)),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Padding(
+        padding: EdgeInsetsDirectional.all(10),
+        child: TextField(
+          // readOnly: true,
+          onTap: () {},
+          inputFormatters: [
+            textTypeReturn(textType),
+          ],
+          onEditingComplete: () => focusScope(context, textFocus),
+          keyboardType: textInputType,
+          decoration: InputDecoration(
+              hintText: hintText,
+              border: InputBorder.none,
+              focusedBorder: InputBorder.none),
         ),
+      ),
+    );
+  }
+
+  //bottomAppBar
+  Widget bottomAppBar() {
+    return Container(
+      height: deviceHeight(context) * 0.12,
+      decoration: BoxDecoration(
+        color: '#A0A0A0'.toColor().withOpacity(0.4),
       ),
     );
   }
