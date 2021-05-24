@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:papikost/ui/constant/constant.dart';
 import 'package:papikost/ui/enum/enum.dart';
 import 'package:papikost/ui/utils/validator.dart';
-import 'package:supercharged/supercharged.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -45,7 +45,7 @@ class _HomeBodyState extends State<HomeBody> with Validator {
     'Sign Up',
   ];
 
-  bool? statusNew = true;
+  bool? isStatusNew = true;
 
   String? name;
 
@@ -69,12 +69,8 @@ class _HomeBodyState extends State<HomeBody> with Validator {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _appBar(),
-          SizedBox(
-            height: deviceHeight(context) * 0.1,
-          ),
           pageActive == "Login" ? _textLogin() : _textSignUp(),
           Expanded(flex: 2, child: _pageBuilder()),
-          bottomAppBar(),
         ],
       ),
     );
@@ -126,6 +122,8 @@ class _HomeBodyState extends State<HomeBody> with Validator {
       onTap: () async {
         pageActive = tabBarTextList[i!];
         setState(() {});
+
+        //change pageview show
         _controller.jumpToPage(i);
       },
       child: Container(
@@ -166,8 +164,8 @@ class _HomeBodyState extends State<HomeBody> with Validator {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          statusNew! ? _textWelcomeNew() : _textWelcomeRememberMe(),
-          statusNew! ? _textSecondRowNew() : _textSecondRowRememberMe(),
+          isStatusNew! ? _textWelcomeNew() : _textWelcomeRememberMe(),
+          isStatusNew! ? _textSecondRowNew() : _textSecondRowRememberMe(),
         ],
       ),
     );
@@ -257,6 +255,50 @@ class _HomeBodyState extends State<HomeBody> with Validator {
     );
   }
 
+  Widget _textSignUpWelcome() {
+    return RichText(
+      text: TextSpan(
+        style: TextStyle(
+          fontSize: 25.0,
+          color: Colors.black,
+        ),
+        children: [
+          TextSpan(text: 'Hello,'),
+          WidgetSpan(
+            child: SizedBox(
+              width: 10,
+            ),
+          ),
+          TextSpan(
+              text: 'Beautifull',
+              style: new TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  Widget _textSignUpWelcomeSecondRow() {
+    return RichText(
+      text: TextSpan(
+        style: TextStyle(
+          overflow: TextOverflow.ellipsis,
+          fontSize: 14.0,
+          color: Colors.black,
+        ),
+        children: [
+          WidgetSpan(
+            child: SizedBox(
+              width: 10,
+            ),
+          ),
+          TextSpan(
+            text: 'Enter your information below or Login With Social Account',
+          ),
+        ],
+      ),
+    );
+  }
+
   //title sign up
   Widget _textSignUp() {
     return Container(
@@ -264,8 +306,8 @@ class _HomeBodyState extends State<HomeBody> with Validator {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          statusNew! ? _textWelcomeNew() : _textWelcomeRememberMe(),
-          statusNew! ? _textSecondRowNew() : _textSecondRowRememberMe(),
+          _textSignUpWelcome(),
+          _textSignUpWelcomeSecondRow(),
         ],
       ),
     );
@@ -293,13 +335,15 @@ class _HomeBodyState extends State<HomeBody> with Validator {
                 height: 20,
               ),
               _textField(
-                  context: context,
-                  hintText: 'Email',
-                  textFocus: TextFocus.focus),
+                context: context,
+                hintText: 'Email',
+                textFocus: TextFocus.focus,
+              ),
               _textField(
-                  context: context,
-                  hintText: 'Password',
-                  textFocus: TextFocus.unFocus),
+                context: context,
+                hintText: 'Password',
+                textFocus: TextFocus.unFocus,
+              ),
             ],
           ),
         );
@@ -333,6 +377,7 @@ class _HomeBodyState extends State<HomeBody> with Validator {
                 hintText: 'Password',
                 textFocus: TextFocus.unFocus,
               ),
+              _button(),
             ],
           ),
         );
@@ -378,7 +423,8 @@ class _HomeBodyState extends State<HomeBody> with Validator {
       BuildContext? context,
       String? hintText,
       TextInputType textInputType = TextInputType.text,
-      TextType textType = TextType.text}) {
+      TextType textType = TextType.text,
+      Function? onChange}) {
     return Container(
       height: deviceHeight(context!) * 0.1,
       margin: EdgeInsets.symmetric(vertical: 5),
@@ -391,7 +437,12 @@ class _HomeBodyState extends State<HomeBody> with Validator {
         padding: EdgeInsetsDirectional.all(10),
         child: TextField(
           // readOnly: true,
-          onTap: () {},
+          onTap: () async {},
+          onChanged: (value) async {
+            onChange != null
+                ? onChange()
+                : print('belum ada parametes $hintText');
+          },
           inputFormatters: [
             textTypeReturn(textType),
           ],
@@ -406,12 +457,16 @@ class _HomeBodyState extends State<HomeBody> with Validator {
     );
   }
 
-  //bottomAppBar
-  Widget bottomAppBar() {
-    return Container(
-      height: deviceHeight(context) * 0.12,
-      decoration: BoxDecoration(
-        color: '#A0A0A0'.toColor().withOpacity(0.4),
+  Widget _button() {
+    return GestureDetector(
+      onTap: null,
+      child: Container(
+        height: deviceHeight(context) * 0.1,
+        width: deviceWidth(context) * 0.2,
+        decoration: BoxDecoration(
+          color: buttonLoginColor.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(6),
+        ),
       ),
     );
   }
