@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:papikost/core/controller/location_provider.dart';
 import 'package:papikost/core/controller/splashscreen_provider.dart';
 import 'package:papikost/ui/constant/constant.dart';
 import 'package:papikost/ui/router/router_generator.dart';
@@ -24,10 +25,11 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => SplashScreenProvider()),
+        ChangeNotifierProvider(create: (context) => LocationProv()),
       ],
       child: MaterialApp(
         onGenerateRoute: RouterGenerator.generateRoute,
-        initialRoute: RouterGenerator.routeLoginPage,
+        initialRoute: RouterGenerator.routeHomeScreen,
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:papikost/ui/constant/constant.dart';
 import 'package:papikost/ui/enum/enum.dart';
+import 'package:papikost/ui/router/router_generator.dart';
 import 'package:papikost/ui/utils/validator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -51,8 +52,11 @@ class _HomeBodyState extends State<HomeBody> with Validator {
 
   String? pageActive;
 
-  PageController _controller = PageController(initialPage: 0);
+  String? coba;
 
+  //controller
+  PageController _controller = PageController(initialPage: 0);
+  TextEditingController _textEditingController = TextEditingController();
   //function
 
   @override
@@ -436,8 +440,9 @@ class _HomeBodyState extends State<HomeBody> with Validator {
       child: Padding(
         padding: EdgeInsetsDirectional.all(10),
         child: TextField(
+          controller: _textEditingController,
           // readOnly: true,
-          onTap: () async {},
+          onTap: () {},
           onChanged: (value) async {
             onChange != null
                 ? onChange()
@@ -459,7 +464,8 @@ class _HomeBodyState extends State<HomeBody> with Validator {
 
   Widget _button() {
     return GestureDetector(
-      onTap: null,
+      onTap: () =>
+          Navigator.pushNamed(context, RouterGenerator.routeHomeScreen),
       child: Container(
         height: deviceHeight(context) * 0.1,
         width: deviceWidth(context) * 0.2,
