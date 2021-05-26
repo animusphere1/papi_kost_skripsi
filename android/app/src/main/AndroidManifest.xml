@@ -7,6 +7,8 @@
    <application
         android:label="papikost"
         android:icon="@mipmap/ic_launcher">
+        <meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="AIzaSyBtSvNPt4brk2qW7rronFrpX2V1O8K5jsM"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

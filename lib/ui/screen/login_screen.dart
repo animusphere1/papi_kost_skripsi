@@ -4,7 +4,6 @@ import 'package:papikost/ui/constant/constant.dart';
 import 'package:papikost/ui/enum/enum.dart';
 import 'package:papikost/ui/router/router_generator.dart';
 import 'package:papikost/ui/utils/validator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
