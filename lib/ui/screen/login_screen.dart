@@ -1,8 +1,11 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:papikost/ui/constant/constant.dart';
 import 'package:papikost/ui/enum/enum.dart';
 import 'package:papikost/ui/router/router_generator.dart';
+import 'package:papikost/ui/utils/global_function.dart';
+import 'package:papikost/ui/utils/property.dart';
 import 'package:papikost/ui/utils/validator.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -27,7 +30,6 @@ class HomeBody extends StatefulWidget {
 
 class _HomeBodyState extends State<HomeBody> with Validator {
   //property
-
   TextStyle textStyleStatusTrue = TextStyle(
     fontWeight: FontWeight.w700,
     fontSize: 15,
@@ -51,13 +53,11 @@ class _HomeBodyState extends State<HomeBody> with Validator {
 
   String? pageActive;
 
-  String? coba;
-
   //controller
   PageController _controller = PageController(initialPage: 0);
   TextEditingController _textEditingController = TextEditingController();
-  //function
 
+  //function
   @override
   initState() {
     super.initState();
@@ -72,8 +72,12 @@ class _HomeBodyState extends State<HomeBody> with Validator {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _appBar(),
-          pageActive == "Login" ? _textLogin() : _textSignUp(),
-          Expanded(flex: 2, child: _pageBuilder()),
+          pageActive == "Login"
+              ? Container(
+                  height: deviceHeight(context) * 0.1, child: _textLogin())
+              : Container(
+                  height: deviceHeight(context) * 0.1, child: _textSignUp()),
+          Expanded(child: _pageBuilder()),
         ],
       ),
     );
@@ -108,7 +112,7 @@ class _HomeBodyState extends State<HomeBody> with Validator {
               status: index == i,
               text: listPage[i],
               i: i,
-              textSize: _textSize(listPage[i], textStyleStatusTrue),
+              textSize: underLineTextSize(listPage[i], textStyleStatusTrue),
             ),
         ],
       ),
@@ -223,11 +227,6 @@ class _HomeBodyState extends State<HomeBody> with Validator {
           color: Colors.black,
         ),
         children: [
-          WidgetSpan(
-            child: SizedBox(
-              width: 10,
-            ),
-          ),
           TextSpan(
             text: '${name!} !',
             style: TextStyle(fontWeight: FontWeight.bold),
@@ -245,11 +244,6 @@ class _HomeBodyState extends State<HomeBody> with Validator {
           color: Colors.black,
         ),
         children: [
-          WidgetSpan(
-            child: SizedBox(
-              width: 10,
-            ),
-          ),
           TextSpan(
             text: 'Choose Your New Home Now !',
           ),
@@ -289,11 +283,6 @@ class _HomeBodyState extends State<HomeBody> with Validator {
           color: Colors.black,
         ),
         children: [
-          WidgetSpan(
-            child: SizedBox(
-              width: 10,
-            ),
-          ),
           TextSpan(
             text: 'Enter your information below or Login With Social Account',
           ),
@@ -314,16 +303,6 @@ class _HomeBodyState extends State<HomeBody> with Validator {
         ],
       ),
     );
-  }
-
-  //property title
-  Size _textSize(String text, TextStyle style) {
-    TextPainter textPainter = TextPainter(
-        text: TextSpan(text: text, style: style),
-        maxLines: 1,
-        textDirection: TextDirection.ltr)
-      ..layout(minWidth: 0, maxWidth: double.infinity);
-    return textPainter.size;
   }
 
   //pageview textfield login and signup
@@ -347,6 +326,7 @@ class _HomeBodyState extends State<HomeBody> with Validator {
                 hintText: 'Password',
                 textFocus: TextFocus.unFocus,
               ),
+              _button(() => print(index), text: 'Login'),
             ],
           ),
         );
@@ -380,7 +360,7 @@ class _HomeBodyState extends State<HomeBody> with Validator {
                 hintText: 'Password',
                 textFocus: TextFocus.unFocus,
               ),
-              _button(),
+              _button(() => print(index), text: 'Sign Up'),
             ],
           ),
         );
@@ -407,17 +387,6 @@ class _HomeBodyState extends State<HomeBody> with Validator {
         },
       ),
     );
-  }
-
-  //textField widget
-  dynamic focusScope(BuildContext context, TextFocus focus) {
-    switch (focus) {
-      case TextFocus.focus:
-        return FocusScope.of(context).nextFocus();
-      case TextFocus.unFocus:
-        return FocusScope.of(context).unfocus();
-      default:
-    }
   }
 
   //textfield widget
@@ -461,16 +430,14 @@ class _HomeBodyState extends State<HomeBody> with Validator {
     );
   }
 
-  Widget _button() {
-    return GestureDetector(
-      onTap: () =>
-          Navigator.pushNamed(context, RouterGenerator.routeHomeScreen),
+  Widget _button(Function? function, {String text = 'Waiting'}) {
+    return ElevatedButton(
+      onPressed: () => function != null
+          ? function()
+          : print('belom ada function button $text'),
       child: Container(
-        height: deviceHeight(context) * 0.1,
-        width: deviceWidth(context) * 0.2,
-        decoration: BoxDecoration(
-          color: buttonLoginColor.withOpacity(0.8),
-          borderRadius: BorderRadius.circular(6),
+        child: Center(
+          child: Text(text),
         ),
       ),
     );

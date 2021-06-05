@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:papikost/ui/constant/constant.dart';
+import 'package:papikost/core/controller/location_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -18,39 +19,27 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   initState() {
     super.initState();
+    // Provider.of<LocationProv>(context, listen: false).loadLocation();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Stack(
-        children: [
-          Center(
-            child: Container(
-              height: deviceHeight(context) * 0.4,
-              child: GoogleMap(
-                onMapCreated: (GoogleMapController controller) {
-                  googleMapController = controller;
-                  setState(() {});
-                },
-                initialCameraPosition: _kGooglePlex,
-              ),
+    return Scaffold(
+      body: Container(
+        child: ListView(
+          children: [
+            Consumer<LocationProv>(
+              builder: (context, prov, _) {
+                if (prov.address == null) {
+                  prov.loadLocation();
+                  return Text('Sabar');
+                }
+
+                return Text(prov.address.toString());
+              },
             ),
-          ),
-          GestureDetector(
-            onTap: () {
-              googleMapController!.animateCamera(CameraUpdate.newCameraPosition(
-                  CameraPosition(
-                      target: LatLng(-6.20978, -64.91262), zoom: 14.0)));
-            },
-            child: Center(
-              child: Container(
-                width: 100,
-                color: Colors.yellow,
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
