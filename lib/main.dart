@@ -29,7 +29,7 @@ class _MyAppState extends State<MyApp> {
       ],
       child: MaterialApp(
         onGenerateRoute: RouterGenerator.generateRoute,
-        initialRoute: RouterGenerator.routeHomeScreen,
+        initialRoute: RouterGenerator.routeLoginPage,
       ),
     );
   }

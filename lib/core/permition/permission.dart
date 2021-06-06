@@ -5,7 +5,7 @@ class Permission {
   var serviceEnabled;
   var permission;
 
-  gpsPermission() async {
+  Future<void> gpsPermission() async {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return Future.error('Location services are disabled.');

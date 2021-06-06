@@ -17,26 +17,30 @@ class LocationProv extends ChangeNotifier {
   //Load Location User
   void loadLocation() async {
     //getPermition
-    Permission.instance.gpsPermission();
+    await Permission.instance.gpsPermission();
 
     //getPosition
-    Geolocator.getPositionStream().listen((event) {
+    streamLocation = Geolocator.getPositionStream().listen((event) {
       myLoc(event);
     });
 
-    // notifyListeners();
+    notifyListeners();
   }
 
   void myLoc(Position position) async {
     print('hasil nya : ${position.latitude} & ${position.longitude}');
 
+    List<Placemark> geoCoding = [];
+
     print(calculateDistance(position.latitude, position.longitude,
         position.latitude, position.longitude));
 
-    List<Placemark> geoCoding =
+    geoCoding =
         await placemarkFromCoordinates(position.latitude, position.longitude);
 
     print(geoCoding[0].street);
+
+    address = geoCoding[0].street;
 
     notifyListeners();
   }

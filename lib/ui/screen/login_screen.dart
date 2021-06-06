@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:papikost/ui/constant/constant.dart';
 import 'package:papikost/ui/enum/enum.dart';
 import 'package:papikost/ui/router/router_generator.dart';
+import 'package:papikost/ui/screen/widget/textfield.dart';
 import 'package:papikost/ui/utils/global_function.dart';
 import 'package:papikost/ui/utils/property.dart';
 import 'package:papikost/ui/utils/validator.dart';
@@ -55,7 +55,6 @@ class _HomeBodyState extends State<HomeBody> with Validator {
 
   //controller
   PageController _controller = PageController(initialPage: 0);
-  TextEditingController _textEditingController = TextEditingController();
 
   //function
   @override
@@ -313,20 +312,23 @@ class _HomeBodyState extends State<HomeBody> with Validator {
           margin: EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             children: [
+              TextFieldItem(
+                hintText: 'Email',
+                focus: TextFocus.focus,
+              ),
+              TextFieldItem(
+                icon: Icons.remove_red_eye,
+                hintText: "Password",
+                statusObscure: true,
+                focus: TextFocus.unFocus,
+                onChange: (value) => null,
+              ),
+              _button(() => null, text: 'Login'),
+              Expanded(child: Container()),
+              _forgotPassword(),
               SizedBox(
                 height: 20,
               ),
-              _textField(
-                context: context,
-                hintText: 'Email',
-                textFocus: TextFocus.focus,
-              ),
-              _textField(
-                context: context,
-                hintText: 'Password',
-                textFocus: TextFocus.unFocus,
-              ),
-              _button(() => print(index), text: 'Login'),
             ],
           ),
         );
@@ -335,37 +337,35 @@ class _HomeBodyState extends State<HomeBody> with Validator {
           margin: EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             children: [
+              TextFieldItem(
+                hintText: 'Email',
+                focus: TextFocus.focus,
+              ),
+              TextFieldItem(
+                hintText: 'Username',
+                focus: TextFocus.focus,
+              ),
+              TextFieldItem(
+                hintText: 'Name',
+                focus: TextFocus.focus,
+              ),
+              TextFieldItem(
+                hintText: 'Address',
+                focus: TextFocus.focus,
+              ),
+              TextFieldItem(
+                hintText: 'Password',
+                icon: Icons.remove_red_eye,
+                focus: TextFocus.unFocus,
+              ),
               SizedBox(
                 height: 20,
-              ),
-              _textField(
-                context: context,
-                hintText: 'Fullname',
-                textFocus: TextFocus.focus,
-              ),
-              _textField(
-                context: context,
-                hintText: 'Phone Number',
-                textFocus: TextFocus.focus,
-                textInputType: TextInputType.phone,
-                textType: TextType.phoneNumber,
-              ),
-              _textField(
-                context: context,
-                hintText: 'Email Address',
-                textFocus: TextFocus.focus,
-              ),
-              _textField(
-                context: context,
-                hintText: 'Password',
-                textFocus: TextFocus.unFocus,
               ),
               _button(() => print(index), text: 'Sign Up'),
             ],
           ),
         );
     }
-
     return Container();
   }
 
@@ -390,46 +390,8 @@ class _HomeBodyState extends State<HomeBody> with Validator {
   }
 
   //textfield widget
-  Widget _textField(
-      {TextFocus textFocus = TextFocus.focus,
-      BuildContext? context,
-      String? hintText,
-      TextInputType textInputType = TextInputType.text,
-      TextType textType = TextType.text,
-      Function? onChange}) {
-    return Container(
-      height: deviceHeight(context!) * 0.1,
-      margin: EdgeInsets.symmetric(vertical: 5),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.black12.withOpacity(0.05)),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Padding(
-        padding: EdgeInsetsDirectional.all(10),
-        child: TextField(
-          controller: _textEditingController,
-          // readOnly: true,
-          onTap: () {},
-          onChanged: (value) async {
-            onChange != null
-                ? onChange()
-                : print('belum ada parametes $hintText');
-          },
-          inputFormatters: [
-            textTypeReturn(textType),
-          ],
-          onEditingComplete: () => focusScope(context, textFocus),
-          keyboardType: textInputType,
-          decoration: InputDecoration(
-              hintText: hintText,
-              border: InputBorder.none,
-              focusedBorder: InputBorder.none),
-        ),
-      ),
-    );
-  }
 
+  //button widget
   Widget _button(Function? function, {String text = 'Waiting'}) {
     return ElevatedButton(
       onPressed: () => function != null
@@ -441,5 +403,33 @@ class _HomeBodyState extends State<HomeBody> with Validator {
         ),
       ),
     );
+  }
+
+  //forgot password text
+  Widget _forgotPassword() {
+    return Container(
+      child: Text(
+        'Forget Password ?',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+}
+
+class StatusObscure extends StatefulWidget {
+  Function(bool)? func;
+
+  StatusObscure({this.func});
+
+  @override
+  _StatusObscureState createState() => _StatusObscureState();
+}
+
+class _StatusObscureState extends State<StatusObscure> {
+  @override
+  Widget build(BuildContext context) {
+    return Container();
   }
 }
