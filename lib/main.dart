@@ -1,17 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:papikost/core/controller/controller_screen/controller_login.dart';
 import 'package:papikost/core/controller/location_provider.dart';
 import 'package:papikost/core/controller/splashscreen_provider.dart';
+import 'package:papikost/core/controller/theme_provider.dart';
 import 'package:papikost/ui/constant/constant.dart';
 import 'package:papikost/ui/router/router_generator.dart';
 import 'package:provider/provider.dart';
 
 main(List<String> args) {
   runApp(MyApp());
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: statusBarColor,
-  ));
 }
 
 class MyApp extends StatefulWidget {
@@ -26,10 +25,17 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(create: (context) => SplashScreenProvider()),
         ChangeNotifierProvider(create: (context) => LocationProv()),
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (context) => ControllerLogin()),
       ],
-      child: MaterialApp(
-        onGenerateRoute: RouterGenerator.generateRoute,
-        initialRoute: RouterGenerator.routeLoginPage,
+      child: Consumer<ThemeProvider>(
+        builder: (context, prov, _) {
+          return MaterialApp(
+            onGenerateRoute: RouterGenerator.generateRoute,
+            initialRoute: RouterGenerator.routeLoginPage,
+            theme: prov.themeData,
+          );
+        },
       ),
     );
   }

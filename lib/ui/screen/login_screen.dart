@@ -4,7 +4,6 @@ import 'package:papikost/ui/constant/constant.dart';
 import 'package:papikost/ui/enum/enum.dart';
 import 'package:papikost/ui/router/router_generator.dart';
 import 'package:papikost/ui/screen/widget/textfield.dart';
-import 'package:papikost/ui/utils/global_function.dart';
 import 'package:papikost/ui/utils/property.dart';
 import 'package:papikost/ui/utils/validator.dart';
 
@@ -40,7 +39,7 @@ class _HomeBodyState extends State<HomeBody> with Validator {
     color: Colors.grey.withOpacity(0.5),
   );
 
-  int index = 0;
+  int indexTabBar = 0;
 
   List<String> tabBarTextList = [
     'Login',
@@ -48,13 +47,12 @@ class _HomeBodyState extends State<HomeBody> with Validator {
   ];
 
   bool? isStatusNew = true;
-
   String? name;
-
   String? pageActive;
+  bool isRememberMe = false;
 
   //controller
-  PageController _controller = PageController(initialPage: 0);
+  PageController _pageController = PageController(initialPage: 0);
 
   //function
   @override
@@ -85,7 +83,6 @@ class _HomeBodyState extends State<HomeBody> with Validator {
   //appbar
   Widget _appBar() {
     return Container(
-      // height: deviceHeight(context) * 0.2,
       margin: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
       child: Row(
         children: [
@@ -94,7 +91,7 @@ class _HomeBodyState extends State<HomeBody> with Validator {
             height: 15,
             width: 10,
             decoration: BoxDecoration(
-              color: statusBarColor,
+              color: Theme.of(context).accentColor,
             ),
           ),
         ],
@@ -108,7 +105,7 @@ class _HomeBodyState extends State<HomeBody> with Validator {
         children: [
           for (var i = 0; i < listPage.length; i++)
             _tabBarText(
-              status: index == i,
+              status: indexTabBar == i,
               text: listPage[i],
               i: i,
               textSize: underLineTextSize(listPage[i], textStyleStatusTrue),
@@ -125,12 +122,8 @@ class _HomeBodyState extends State<HomeBody> with Validator {
     Size? textSize,
   }) {
     return GestureDetector(
-      onTap: () async {
-        pageActive = tabBarTextList[i!];
-        setState(() {});
-
-        //change pageview show
-        _controller.jumpToPage(i);
+      onTap: () {
+        movePage(i!);
       },
       child: Container(
         margin: EdgeInsets.only(right: 10),
@@ -317,18 +310,16 @@ class _HomeBodyState extends State<HomeBody> with Validator {
                 focus: TextFocus.focus,
               ),
               TextFieldItem(
-                icon: Icons.remove_red_eye,
                 hintText: "Password",
                 statusObscure: true,
                 focus: TextFocus.unFocus,
-                onChange: (value) => null,
+                textType: TextType.password,
               ),
-              _button(() => null, text: 'Login'),
-              Expanded(child: Container()),
-              _forgotPassword(),
+              _button(text: 'Login'),
               SizedBox(
                 height: 20,
               ),
+              _forgotPasswordAndSignUp(),
             ],
           ),
         );
@@ -339,29 +330,29 @@ class _HomeBodyState extends State<HomeBody> with Validator {
             children: [
               TextFieldItem(
                 hintText: 'Email',
-                focus: TextFocus.focus,
-              ),
-              TextFieldItem(
-                hintText: 'Username',
-                focus: TextFocus.focus,
               ),
               TextFieldItem(
                 hintText: 'Name',
-                focus: TextFocus.focus,
               ),
               TextFieldItem(
                 hintText: 'Address',
-                focus: TextFocus.focus,
+              ),
+              TextFieldItem(
+                hintText: 'Phone Number',
+                textType: TextType.phoneNumber,
               ),
               TextFieldItem(
                 hintText: 'Password',
-                icon: Icons.remove_red_eye,
                 focus: TextFocus.unFocus,
+                statusObscure: true,
+                textType: TextType.password,
               ),
               SizedBox(
                 height: 20,
               ),
-              _button(() => print(index), text: 'Sign Up'),
+              _button(
+                text: 'Sign Up',
+              ),
             ],
           ),
         );
@@ -374,9 +365,9 @@ class _HomeBodyState extends State<HomeBody> with Validator {
       margin: EdgeInsets.symmetric(horizontal: 10),
       child: PageView.builder(
         physics: BouncingScrollPhysics(),
-        controller: _controller,
+        controller: _pageController,
         onPageChanged: (i) {
-          index = i;
+          indexTabBar = i;
           pageActive = listPage[i];
 
           setState(() {});
@@ -389,14 +380,14 @@ class _HomeBodyState extends State<HomeBody> with Validator {
     );
   }
 
-  //textfield widget
-
   //button widget
-  Widget _button(Function? function, {String text = 'Waiting'}) {
+  Widget _button({Function? onTap, String text = 'Waiting'}) {
     return ElevatedButton(
-      onPressed: () => function != null
-          ? function()
-          : print('belom ada function button $text'),
+      onPressed: () =>
+          onTap != null ? onTap() : print('belom ada function button $text'),
+      style: ElevatedButton.styleFrom(
+        primary: Theme.of(context).buttonColor,
+      ),
       child: Container(
         child: Center(
           child: Text(text),
@@ -405,31 +396,35 @@ class _HomeBodyState extends State<HomeBody> with Validator {
     );
   }
 
+  Widget _forgotPasswordAndSignUp() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        _forgotPassword(),
+      ],
+    );
+  }
+
   //forgot password text
   Widget _forgotPassword() {
-    return Container(
-      child: Text(
-        'Forget Password ?',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: () => null,
+      child: Container(
+        child: Text(
+          'Forgot Password?',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
   }
-}
 
-class StatusObscure extends StatefulWidget {
-  Function(bool)? func;
+  //function
+  void movePage(int i) {
+    pageActive = tabBarTextList[i];
+    setState(() {});
 
-  StatusObscure({this.func});
-
-  @override
-  _StatusObscureState createState() => _StatusObscureState();
-}
-
-class _StatusObscureState extends State<StatusObscure> {
-  @override
-  Widget build(BuildContext context) {
-    return Container();
+    _pageController.jumpToPage(i);
   }
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:papikost/ui/enum/enum.dart';
+import 'package:papikost/ui/utils/global_function.dart';
+import 'package:papikost/ui/utils/validator.dart';
 
 // ignore: must_be_immutable
 class TextFieldItem extends StatefulWidget {
-  IconData? icon;
   String? hintText;
   bool statusObscure;
   bool readOnly;
@@ -14,24 +15,20 @@ class TextFieldItem extends StatefulWidget {
   TextFocus focus;
 
   TextFieldItem({
-    this.icon,
     @required this.hintText,
     this.statusObscure = false,
     this.readOnly = false,
     this.inputType = TextInputType.text,
     this.textType = TextType.phoneNumber,
     this.onChange,
-    this.focus = TextFocus.unFocus,
+    this.focus = TextFocus.focus,
   });
 
   @override
   _TextFieldItemState createState() => _TextFieldItemState();
 }
 
-class _TextFieldItemState extends State<TextFieldItem> {
-  TextEditingController _textEditingController =
-      TextEditingController(text: '');
-
+class _TextFieldItemState extends State<TextFieldItem> with Validator {
   @override
   initState() {
     super.initState();
@@ -56,17 +53,16 @@ class _TextFieldItemState extends State<TextFieldItem> {
             Expanded(
               child: TextField(
                 textAlignVertical: TextAlignVertical.center,
-                controller: _textEditingController,
                 keyboardType: widget.inputType,
                 inputFormatters: [
-                  textType(),
+                  textTypeReturn(widget.textType),
                 ],
                 onChanged: (value) {
                   widget.onChange != null
                       ? widget.onChange!(value)
                       : print('belum ada function ${widget.hintText}');
                 },
-                onEditingComplete: () => focusScope(context),
+                onEditingComplete: () => focusScope(context, widget.focus),
                 obscureText: widget.statusObscure,
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                 decoration: InputDecoration(
@@ -75,19 +71,7 @@ class _TextFieldItemState extends State<TextFieldItem> {
                 ),
               ),
             ),
-
-            //icon show hide
-            widget.icon != null
-                ? GestureDetector(
-                    onTap: () {
-                      changeObscureText();
-                    },
-                    child: Icon(
-                      widget.icon,
-                      color: Colors.black38.withOpacity(0.5),
-                    ),
-                  )
-                : SizedBox(),
+            isPasswordHaveObscure(widget.statusObscure),
           ],
         ),
       ),
@@ -97,31 +81,34 @@ class _TextFieldItemState extends State<TextFieldItem> {
   void changeObscureText() {
     widget.statusObscure = !widget.statusObscure;
 
-    if (widget.statusObscure)
-      widget.icon = Icons.remove_red_eye;
-    else
-      widget.icon = Icons.visibility_off;
-
     setState(() {});
   }
 
-  FilteringTextInputFormatter textType() {
-    switch (widget.textType) {
-      case TextType.phoneNumber:
-        return FilteringTextInputFormatter.deny(RegExp(r'^0+'),
-            replacementString: '');
-      default:
-        return FilteringTextInputFormatter.allow(RegExp(r"[a-zA-Z]"),
-            replacementString: '');
+  Widget isPasswordHaveObscure(bool isStatusObscure) {
+    if (widget.textType == TextType.password) {
+      if (isStatusObscure) {
+        return GestureDetector(
+          onTap: () {
+            changeObscureText();
+          },
+          child: Icon(
+            Icons.remove_red_eye,
+            color: Colors.black38.withOpacity(0.5),
+          ),
+        );
+      } else if (!isStatusObscure) {
+        return GestureDetector(
+          onTap: () {
+            changeObscureText();
+          },
+          child: Icon(
+            Icons.visibility_off,
+            color: Colors.black38.withOpacity(0.5),
+          ),
+        );
+      }
     }
-  }
 
-  dynamic focusScope(BuildContext context) {
-    switch (widget.focus) {
-      case TextFocus.focus:
-        return FocusScope.of(context).nextFocus();
-      case TextFocus.unFocus:
-        return FocusScope.of(context).unfocus();
-    }
+    return SizedBox();
   }
 }
