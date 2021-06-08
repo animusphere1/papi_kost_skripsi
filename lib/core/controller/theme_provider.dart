@@ -18,6 +18,8 @@ class ThemeProvider extends ChangeNotifier {
       cardColor: '#f6f7f9'.toColor(),
       buttonColor: "#ff6600".toColor(),
       fontFamily: 'NunitoSans',
+      bottomSheetTheme:
+          BottomSheetThemeData(backgroundColor: Colors.transparent),
     );
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(

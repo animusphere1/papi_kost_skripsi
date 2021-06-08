@@ -1,11 +1,13 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:papikost/core/controller/controller_screen/controller_login.dart';
 import 'package:papikost/ui/constant/constant.dart';
 import 'package:papikost/ui/enum/enum.dart';
 import 'package:papikost/ui/router/router_generator.dart';
 import 'package:papikost/ui/screen/widget/textfield.dart';
 import 'package:papikost/ui/utils/property.dart';
 import 'package:papikost/ui/utils/validator.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -27,7 +29,7 @@ class HomeBody extends StatefulWidget {
   _HomeBodyState createState() => _HomeBodyState();
 }
 
-class _HomeBodyState extends State<HomeBody> with Validator {
+class _HomeBodyState extends State<HomeBody> with WidgetsBindingObserver {
   //property
   TextStyle textStyleStatusTrue = TextStyle(
     fontWeight: FontWeight.w700,
@@ -58,8 +60,34 @@ class _HomeBodyState extends State<HomeBody> with Validator {
   @override
   initState() {
     super.initState();
+    WidgetsBinding.instance!.addObserver(this);
     pageActive = tabBarTextList[0];
     setState(() {});
+  }
+
+  @override
+  dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    print(state);
+
+    switch (state) {
+      case AppLifecycleState.paused:
+        print('lagi berhenti');
+        break;
+      case AppLifecycleState.inactive:
+        print('lagi tutup bang');
+        break;
+      case AppLifecycleState.resumed:
+        Navigator.pushNamed(context, RouterGenerator.routeHomeScreen);
+        break;
+      default:
+    }
   }
 
   @override
@@ -306,7 +334,7 @@ class _HomeBodyState extends State<HomeBody> with Validator {
           child: Column(
             children: [
               TextFieldItem(
-                hintText: 'Email',
+                hintText: Provider.of<ControllerLogin>(context).text.toString(),
                 focus: TextFocus.focus,
               ),
               TextFieldItem(
@@ -315,7 +343,10 @@ class _HomeBodyState extends State<HomeBody> with Validator {
                 focus: TextFocus.unFocus,
                 textType: TextType.password,
               ),
-              _button(text: 'Login'),
+              _button(
+                text: 'Login',
+                onTap: () {},
+              ),
               SizedBox(
                 height: 20,
               ),
@@ -426,5 +457,57 @@ class _HomeBodyState extends State<HomeBody> with Validator {
     setState(() {});
 
     _pageController.jumpToPage(i);
+  }
+
+  void showModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Consumer<ControllerLogin>(
+          builder: (context, prov, _) {
+            return Container(
+              child: Center(
+                child: GestureDetector(
+                  onTap: () async {},
+                  child: Container(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            color: Colors.transparent,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  width: deviceWidth(context) * 0.5,
+                                ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    await prov.sendEmail();
+                                  },
+                                  child: CircleAvatar(
+                                    child: Icon(Icons.close),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Container(
+                          color: Colors.yellow,
+                          height: deviceHeight(context) * 0.4,
+                          width: deviceWidth(context),
+                          child: Text(prov.text),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }
